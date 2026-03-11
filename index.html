@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Glass Effect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --blur-intensity: 8px;
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            background-image: url('nature.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* O Cartão Liquid Glass */
+        .glass-container {
+            position: relative;
+            max-width: 50%;
+            height: 50%;
+            border-radius: 50px;
+            margin-bottom: 2em;
+        
+            
+            /* O "Glass" quase transparente */
+            background: rgba(255, 255, 255, 0.03);
+            
+            /* Aqui o blur recebe uma variável para mudar com o slider */
+            backdrop-filter: blur(var(--blur-intensity)) saturate(1.2) contrast(1.1);
+            -webkit-backdrop-filter: blur(var(--blur-intensity)) saturate(1.2) contrast(1.1);
+
+            /* Borda que faz parecer um vidro */
+            border: 1px solid var(--glass-border);
+
+            /* Sombras combinadas para efeito de "lente" saltada */
+            box-shadow: 
+                /* Sombra externa projetada */
+                0 20px 40px rgba(0,0,0,0.3),
+                /* Brilho na borda superior (reflexo da luz) */
+                inset 0 4px 6px rgba(255,255,255,0.4),
+                /* Sombra interna inferior (profundidade do vidro) */
+                inset 0 -10px 20px rgba(0,0,0,0.1),
+                /* Efeito de borda dupla para simular refração */
+                inset 0 0 0 1px rgba(255,255,255,0.1);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        /* hover significa que alguma coisa acontece quando algo acontece, confia */
+        .glass-container:hover {
+            transform: scale(1.05);
+            backdrop-filter: blur(4px) saturate(1.5);
+        }
+        /* Aqui é o h1, ou seja, é a merda do título né!? */
+        .glass-container h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 1em;
+        }
+        /* vou nem comentar o que é o p... */
+        .glass-container p {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.8;
+            margin: 2em;
+        }
+        /* aqui estão os estilos da merda do botão fictício */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Slider */
+        .controls {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+            width: 40%;
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Estilo do input do slider pra ficar namoralzin */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        #blur-value {
+            font-weight: bold;
+            color: #4facfe;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass-container">
+        <h1>Liquid Glass</h1>
+        <p>Este é um exemplo de liquid glass (com um pouco de blur e hover) desenvolvido em CSS puro. O segredo está em captar o que nos dá a sensação de vidro e buscar desenhar com sombras e luzes no código.</p>
+        <a href="#" class="btn">Explorar</a>
+    </div>
+
+    <div class="controls">
+        <label for="blur-slider">Intensidade do Vidro: <span id="blur-value">8px</span></label>
+        <input type="range" id="blur-slider" min="0" max="40" value="8">
+    </div>
+
+    <!-- Daqui pra baixo é JAVASCRIPT, como é um código numa página só, virou essa kitnet de linguagens e é isso... MAS SEPARE OS ARQUIVOS SEMPRE!-->
+    <script>
+        const slider = document.getElementById('blur-slider');
+        const blurValueDisplay = document.getElementById('blur-value');
+        const root = document.documentElement;
+
+        // Escuta o movimento do slider.
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            
+            // Atualiza o texto na tela.
+            blurValueDisplay.textContent = `${val}px`;
+            
+            // Atualiza a variável CSS no root criado lá em riba.
+            root.style.setProperty('--blur-intensity', `${val}px`);
+            
+            // Se o blur for 0, o vidro fica muito transparente como no iPoney.
+            if(val == 0) {
+                document.getElementById('card-text').style.opacity = "0.5";
+            } else {
+                document.getElementById('card-text').style.opacity = "1";
+            }
+        });
+    </script>
+
+</body>
+    <!-- Fim de papo, quem gostou bate palma, quem não gostou é vacilão-->
+</html>
